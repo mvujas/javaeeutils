@@ -42,7 +42,7 @@ public abstract class EntityRepository<T, K> {
 			className = entityClass.getName();
 		}
 	}
-	
+	  
 	protected final <R> R safeTransactionBoilerplate(Function<EntityManager, R> transactionalFunction) throws Exception {
 		EntityManager entityManager = dataSource.getEnityManager();
 		EntityTransaction transaction = null;
@@ -70,10 +70,8 @@ public abstract class EntityRepository<T, K> {
 	
 	public T save(final T entity) {
 		try {
-			return safeTransactionBoilerplate(em -> {
-				em.persist(entity);
-				return entity;
-			});
+			// this somehow works as a way to save as well as to update the entity
+			return safeTransactionBoilerplate(em -> em.merge(entity));
 		} catch (Exception e) {
 			return null;
 		}
@@ -97,6 +95,20 @@ public abstract class EntityRepository<T, K> {
 		
 		entityManager.close();
 		return result;
+	}
+	
+	@Deprecated
+	public boolean delete(final T entity) {
+		try {
+			safeTransactionBoilerplate(em -> {
+				T newEntity = em.merge(entity);
+				em.remove(newEntity);
+				return null;
+			});
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	
