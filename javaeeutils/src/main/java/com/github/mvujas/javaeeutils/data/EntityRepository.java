@@ -24,7 +24,7 @@ public abstract class EntityRepository<T, K> {
 		this(null);
 	}
 	
-	public void initializeRepository(PersistentDataSource dataSource) {
+	public final void initializeRepository(PersistentDataSource dataSource) {
 		this.dataSource = dataSource;
 		if(this.dataSource == null) {
 			this.dataSource = GlobalPersistentDataSource.getInstance();
